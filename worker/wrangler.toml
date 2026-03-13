@@ -12,7 +12,7 @@ class_name = "UserAgent"
 
 [[migrations]]
 tag = "v1"
-new_classes = ["UserAgent"]
+new_sqlite_classes = ["UserAgent"]
 
 [vars]
 ENVIRONMENT = "development"
