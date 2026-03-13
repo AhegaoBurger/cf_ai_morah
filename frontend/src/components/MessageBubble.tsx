@@ -21,6 +21,7 @@ export function MessageBubble({ role, content }: MessageBubbleProps) {
         lineHeight: 1.5,
         whiteSpace: "pre-wrap",
         wordBreak: "break-word",
+        dir: "auto",
       }}>
         {content}
       </div>

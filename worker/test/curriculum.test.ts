@@ -8,8 +8,9 @@ describe("curriculum", () => {
 
   it("getChapter returns chapter by number", () => {
     const ch = getChapter(1);
-    expect(ch.number).toBe(1);
-    expect(ch.titleEn).toContain("Alphabet");
+    expect(ch).not.toBeNull();
+    expect(ch!.number).toBe(1);
+    expect(ch!.titleEn).toContain("Alphabet");
   });
 
   it("getChapter returns null for invalid chapter", () => {

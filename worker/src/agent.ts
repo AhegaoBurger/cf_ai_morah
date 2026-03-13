@@ -74,12 +74,19 @@ export class UserAgent {
       ...us.history,
     ];
 
-    const aiResponse = await this.env.AI.run(
-      "@cf/meta/llama-3.3-70b-instruct-fp8-fast" as Parameters<Ai["run"]>[0],
-      { messages } as Parameters<Ai["run"]>[1]
-    ) as { response: string };
+    let rawText: string;
+    try {
+      const aiResponse = await this.env.AI.run(
+        "@cf/meta/llama-3.3-70b-instruct-fp8-fast" as Parameters<Ai["run"]>[0],
+        { messages } as Parameters<Ai["run"]>[1]
+      ) as { response: string };
+      rawText = aiResponse.response;
+    } catch {
+      // Remove the user message we just pushed since AI failed
+      us.history.pop();
+      throw new Error("AI service unavailable");
+    }
 
-    const rawText = aiResponse.response;
     this.applyTagUpdates(us, rawText);
     const cleanResponse = stripTags(rawText).trim();
 
@@ -97,8 +104,13 @@ export class UserAgent {
     };
   }
 
-  async getState(): Promise<UserState> {
-    return structuredClone(await this.load());
+  async getState(): Promise<Pick<UserState, "curriculum" | "vocab" | "profile">> {
+    const us = await this.load();
+    return {
+      curriculum: structuredClone(us.curriculum),
+      vocab: structuredClone(us.vocab),
+      profile: structuredClone(us.profile),
+    };
   }
 
   async setTelegram(botToken: string, chatId: string): Promise<void> {

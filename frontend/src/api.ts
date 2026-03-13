@@ -7,7 +7,7 @@ export interface ChatResponse {
   };
 }
 
-export interface UserState extends ChatResponse["state"] {}
+export type UserState = ChatResponse["state"];
 
 export async function sendMessage(message: string): Promise<ChatResponse> {
   const res = await fetch("/chat", {
