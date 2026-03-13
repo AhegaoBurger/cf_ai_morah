@@ -77,7 +77,7 @@ export class UserAgent {
     let rawText: string;
     try {
       const aiResponse = await this.env.AI.run(
-        "@cf/meta/llama-3.3-70b-instruct-fp8-fast" as Parameters<Ai["run"]>[0],
+        "@cf/meta/llama-4-scout-17b-16e-instruct" as Parameters<Ai["run"]>[0],
         { messages } as Parameters<Ai["run"]>[1]
       ) as { response: string };
       rawText = aiResponse.response;
