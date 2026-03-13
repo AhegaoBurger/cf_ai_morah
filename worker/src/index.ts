@@ -6,14 +6,11 @@ export { UserAgent } from "./agent";
 const CORS_HEADERS = {
   "Access-Control-Allow-Origin": "*",
   "Access-Control-Allow-Methods": "GET, POST, OPTIONS",
-  "Access-Control-Allow-Headers": "Content-Type",
+  "Access-Control-Allow-Headers": "Content-Type, X-User-Id",
 };
 
 function getUserId(request: Request): string {
-  // Use session cookie, fallback to IP-based ID for dev
-  const cookie = request.headers.get("Cookie") ?? "";
-  const match = cookie.match(/morah_user=([^;]+)/);
-  return match?.[1] ?? crypto.randomUUID();
+  return request.headers.get("X-User-Id") ?? crypto.randomUUID();
 }
 
 export default {
@@ -57,8 +54,6 @@ export default {
       headers: {
         ...CORS_HEADERS,
         "Content-Type": "application/json",
-        // Set session cookie if new user
-        "Set-Cookie": `morah_user=${userId}; Path=/; SameSite=None; Secure; Max-Age=31536000`,
       },
     });
   },
