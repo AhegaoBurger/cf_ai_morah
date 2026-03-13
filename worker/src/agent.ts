@@ -1,4 +1,4 @@
-import type { Env, UserState, Message } from "./types";
+import type { Env, UserState } from "./types";
 import { buildSystemPrompt } from "./prompts";
 import { parseTags, stripTags } from "./tags";
 
