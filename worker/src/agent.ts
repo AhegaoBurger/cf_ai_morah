@@ -98,7 +98,7 @@ export class UserAgent {
   }
 
   async getState(): Promise<UserState> {
-    return this.load();
+    return structuredClone(await this.load());
   }
 
   async setTelegram(botToken: string, chatId: string): Promise<void> {
@@ -116,7 +116,16 @@ export class UserAgent {
     const url = new URL(request.url);
 
     if (url.pathname === "/chat" && request.method === "POST") {
-      const { message } = await request.json<{ message: string }>();
+      let message: string;
+      try {
+        const body = await request.json<{ message: string }>();
+        if (!body.message || typeof body.message !== "string") {
+          return new Response("message is required", { status: 400 });
+        }
+        message = body.message;
+      } catch {
+        return new Response("Invalid JSON", { status: 400 });
+      }
       const result = await this.chat(message);
       return Response.json(result);
     }
@@ -132,7 +141,14 @@ export class UserAgent {
     }
 
     if (url.pathname === "/telegram" && request.method === "POST") {
-      const { botToken, chatId } = await request.json<{ botToken: string; chatId: string }>();
+      let botToken: string, chatId: string;
+      try {
+        const body = await request.json<{ botToken: string; chatId: string }>();
+        botToken = body.botToken;
+        chatId = body.chatId;
+      } catch {
+        return new Response("Invalid JSON", { status: 400 });
+      }
       await this.setTelegram(botToken, chatId);
       return Response.json({ ok: true });
     }
