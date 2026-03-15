@@ -1,6 +1,6 @@
 # cf_ai_morah — Hebrew Tutor for New Olim
 
-An AI-powered Hebrew tutor for immigrants making aliyah to Israel. Built on Cloudflare Workers, Durable Objects, and Workers AI (Llama 3.3).
+An AI-powered Hebrew tutor for immigrants making aliyah to Israel. Built on Cloudflare Workers, Durable Objects, and Workers AI.
 
 ## Features
 
@@ -8,14 +8,29 @@ An AI-powered Hebrew tutor for immigrants making aliyah to Israel. Built on Clou
 - 10-chapter situational curriculum (inspired by Yes Hebrew)
 - Agent builds a personal profile over time to personalize lessons
 - Adapts to Russian, English, or Hebrew — whatever you write in
+- Knowledge management UI — view, edit, and delete everything the tutor knows about you
 - Optional Telegram bot integration (same chat, same memory)
+- Dark mode with system preference detection
 
 ## Architecture
 
-- **Workers AI (Llama 3.3 70B)** — LLM for tutoring conversations
-- **Durable Objects** — Per-user stateful agent brain (profile, vocab, history)
-- **Cloudflare Workers** — API routing layer
-- **Cloudflare Pages** — React chat UI
+- **Workers AI (Llama 4 Scout 17B)** — MoE LLM for tutoring conversations
+- **Durable Objects (SQLite-backed)** — Per-user stateful agent brain (profile, vocab, curriculum progress, chat history)
+- **Cloudflare Workers** — API routing layer with CORS support
+- **Cloudflare Pages** — React + shadcn/ui + Tailwind CSS v4 frontend
+
+## Tech Stack
+
+### Backend
+- Cloudflare Workers + Durable Objects
+- Workers AI (`@cf/meta/llama-4-scout-17b-16e-instruct`)
+- Structured tag parsing for state updates (`[REMEMBER:]`, `[VOCAB_KNOWN:]`, `[VOCAB_STRUGGLE:]`)
+
+### Frontend
+- React 18 + TypeScript
+- Tailwind CSS v4 + shadcn/ui components
+- Vite 5 build tooling
+- Light/dark theme with localStorage persistence
 
 ## Running Locally
 
@@ -47,12 +62,25 @@ Frontend runs at http://localhost:5173 (proxies API calls to worker)
 cd worker && wrangler deploy
 
 # Deploy frontend (set VITE_API_URL to your worker URL first)
-cd frontend && npm run build && wrangler pages deploy dist
+cd frontend && npm run build && wrangler pages deploy dist --project-name cf-ai-morah
 ```
 
 ## Telegram Setup
 
 1. Create a bot via @BotFather on Telegram
-2. Open the web app → Settings ⚙
+2. Open the web app → Settings (gear icon in sidebar)
 3. Paste your bot token → click Register Bot
 4. Start chatting with your bot on Telegram — same memory as the web UI
+
+## API Endpoints
+
+| Method | Path | Description |
+|--------|------|-------------|
+| POST | `/chat` | Send a message, get AI response + updated state |
+| GET | `/state` | Fetch current user state (profile, vocab, curriculum) |
+| PUT | `/profile` | Update profile fields or vocabulary |
+| POST | `/reset` | Reset all user progress |
+| POST | `/telegram/register` | Register a Telegram bot token |
+| POST | `/telegram/webhook/*` | Telegram webhook handler |
+
+All endpoints require an `X-User-Id` header for user identification.
