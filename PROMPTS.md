@@ -69,3 +69,43 @@ The system prompt in `worker/src/prompts.ts` was designed with Claude Code using
 **Purpose:** Fixed two deployment issues iteratively:
 1. Cloudflare free tier requires SQLite-backed Durable Objects (`new_sqlite_classes` instead of `new_classes` in `wrangler.toml`)
 2. Cross-origin cookie auth doesn't work with `Access-Control-Allow-Origin: *` — replaced cookie-based user identification with `localStorage` + a custom `X-User-Id` header to avoid CORS credential restrictions entirely
+
+---
+
+## 8. Diagnosing Weird AI Responses
+
+**Prompt:**
+> look at this conversation, why are the responses so weird? hi → שָׁלוֹם (Shalom) - Hi! I'm Morah... ok lets start → נְפָלָא (Nifla) - Great! Let's dive into the Alef-Bet...
+
+**Purpose:** Diagnosed issues with AI response quality: robotic/formulaic tone, no medium awareness (asking users to "write a letter" in a chat app), immediate curriculum drilling without rapport building, and repetitive transliteration patterns.
+
+---
+
+## 9. Model Upgrade & System Prompt Improvements
+
+**Prompts:**
+> i dont think transliterations are that big a deal but the first two are good ideas, especially the system prompt improvements. for cloudflare models search online which are available for a free tier
+
+> considering this is a project that i will submit for an internship application at cloudflare what do you think
+
+**Purpose:** Researched Cloudflare Workers AI free tier models and upgraded from `llama-3.3-70b-instruct-fp8-fast` to `llama-4-scout-17b-16e-instruct` (Meta's latest, MoE architecture, better for a CF internship submission). Reworked the system prompt with:
+- Medium awareness ("you are in a TEXT CHAT app")
+- Conversation style rules (short responses, no repetitive patterns)
+- First interaction flow (build rapport before drilling curriculum)
+- Medium constraints (never ask to "write a letter" or "repeat after me")
+- Teaching through conversation, not drills
+
+---
+
+## 10. Knowledge Management UI
+
+**Prompt:**
+> we should add a ui in the settings where the user can see all the context that is known about him and delete it if needed, edit or add it there, sorta like the ui chatgpt has for memories
+
+> every part of the knowledge should be able to be deleted, edited and added
+
+**Purpose:** Added a "What Morah knows about you" section to Settings, inspired by ChatGPT's memory management UI. Includes:
+- Profile fields (name, country, neighborhood, occupation, family, aliyah date) — inline edit, delete, add
+- Personal notes/memories — edit, delete, add
+- Vocabulary (known + struggling) — pill tags with edit/delete, add
+- New `PUT /profile` backend endpoint for partial updates to all user data
