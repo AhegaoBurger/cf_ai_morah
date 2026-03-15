@@ -84,3 +84,12 @@ cd frontend && npm run build && wrangler pages deploy dist --project-name cf-ai-
 | POST | `/telegram/webhook/*` | Telegram webhook handler |
 
 All endpoints require an `X-User-Id` header for user identification.
+
+## Roadmap / Future Features
+
+- [ ] **Generative UI** — Dynamic lesson components rendered via JSON (Vercel AI SDK `json-renderer`), so the AI can output interactive exercises, flashcards, and quizzes instead of plain text
+- [ ] **More data/context connectors** — Pull in external sources (e.g. user's calendar, local news, government forms) to ground lessons in real-life context
+- [ ] **Voice mode** — Speech-to-text input and text-to-speech responses for pronunciation practice and hands-free study
+- [ ] **Domain-specific features** — Deeper specialisation in areas like:
+  - Language learning: spaced-repetition vocab drills, conjugation tables, dictation exercises
+  - Aliyah context: bureaucratic Hebrew (Misrad HaPnim, Bituach Leumi), housing/rental vocab, bank and healthcare phrases
