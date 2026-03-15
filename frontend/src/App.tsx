@@ -1,50 +1,68 @@
 import { useState, useCallback } from "react";
 import { Chat } from "./components/Chat";
-import { Sidebar } from "./components/Sidebar";
+import { AppSidebar } from "./components/Sidebar";
 import { Settings } from "./components/Settings";
 import { useChat } from "./hooks/useChat";
+import { useTheme } from "./components/ThemeProvider";
+import { SidebarProvider, SidebarTrigger } from "./components/ui/sidebar";
+import { Button } from "./components/ui/button";
+import { Sun, Moon } from "lucide-react";
 
 export default function App() {
   const { messages, state, setState, loading, error, send } = useChat();
   const [settingsOpen, setSettingsOpen] = useState(false);
+  const { theme, toggleTheme } = useTheme();
 
   const handleReset = useCallback(async () => {
-    // After reset, refetch state (messages are local, reload page for full reset)
     window.location.reload();
   }, []);
 
   return (
-    <div style={{
-      display: "flex",
-      height: "100dvh",
-      fontFamily: "-apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif",
-      background: "#fff",
-    }}>
-      <Sidebar state={state} onOpenSettings={() => setSettingsOpen(true)} />
+    <SidebarProvider>
+      <div className="flex h-dvh w-full">
+        <AppSidebar state={state} onOpenSettings={() => setSettingsOpen(true)} />
 
-      <main style={{ flex: 1, display: "flex", flexDirection: "column", overflow: "hidden" }}>
-        <header style={{
-          padding: "1rem 1.5rem",
-          borderBottom: "1px solid #e5e7eb",
-          display: "flex",
-          alignItems: "center",
-          gap: "0.5rem",
-        }}>
-          <span style={{ fontSize: 22 }}>🇮🇱</span>
-          <span style={{ fontWeight: 700, fontSize: 18 }}>Morah</span>
-          <span style={{ color: "#9ca3af", fontSize: 14 }}>— Hebrew Tutor for Olim</span>
-        </header>
+        <main className="flex flex-1 flex-col overflow-hidden">
+          <header className="flex items-center gap-2 border-b border-border px-4 py-3">
+            <SidebarTrigger className="-ml-1" />
+            <div className="flex items-center gap-2 flex-1">
+              <span className="text-xl">🇮🇱</span>
+              <span className="font-bold text-lg">Morah</span>
+              <span className="text-muted-foreground text-sm hidden sm:inline">
+                — Hebrew Tutor for Olim
+              </span>
+            </div>
+            <Button
+              variant="ghost"
+              size="icon"
+              onClick={toggleTheme}
+              className="shrink-0"
+            >
+              {theme === "light" ? (
+                <Moon className="h-4 w-4" />
+              ) : (
+                <Sun className="h-4 w-4" />
+              )}
+            </Button>
+          </header>
 
-        {error && (
-          <div style={{ background: "#fee2e2", color: "#dc2626", padding: "0.5rem 1.5rem", fontSize: 14 }}>
-            {error}
-          </div>
-        )}
+          {error && (
+            <div className="bg-destructive/10 text-destructive px-6 py-2 text-sm">
+              {error}
+            </div>
+          )}
 
-        <Chat messages={messages} loading={loading} onSend={send} />
-      </main>
+          <Chat messages={messages} loading={loading} onSend={send} />
+        </main>
 
-      {settingsOpen && <Settings onClose={() => setSettingsOpen(false)} onReset={handleReset} state={state} onStateUpdate={setState} />}
-    </div>
+        <Settings
+          open={settingsOpen}
+          onOpenChange={setSettingsOpen}
+          onReset={handleReset}
+          state={state}
+          onStateUpdate={setState}
+        />
+      </div>
+    </SidebarProvider>
   );
 }

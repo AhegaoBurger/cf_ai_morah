@@ -109,3 +109,31 @@ The system prompt in `worker/src/prompts.ts` was designed with Claude Code using
 - Personal notes/memories — edit, delete, add
 - Vocabulary (known + struggling) — pill tags with edit/delete, add
 - New `PUT /profile` backend endpoint for partial updates to all user data
+
+---
+
+## 11. UI Redesign — shadcn/ui + Tailwind + Dark Mode
+
+**Prompts:**
+> now i want you to load the frontend design skill and help me improve the ui, im thinking we should use shadcn but we can discuss this. right now it just feels boring and not engaging, also no dark mode
+
+> yeah warm and educational sounds good
+
+> shadcn has a sidebar component and its collapsible
+
+> yeah lets do a full migration
+
+> for now the ui's that we have are fine i think
+
+> yeah go ahead [approach A: shadcn/ui + Tailwind]
+
+**Purpose:** Complete frontend redesign from inline styles to Tailwind CSS v4 + shadcn/ui component library. Changes include:
+- Full migration from inline `style` objects to Tailwind utility classes
+- Warm amber/orange educational color palette using oklch color space
+- Dark mode with `class` strategy, localStorage persistence, OS preference detection, and FOUC prevention
+- Collapsible sidebar using shadcn's Sidebar component (icon-only when collapsed)
+- shadcn Dialog for Settings (replaces hand-rolled modal), with proper focus trapping and accessibility
+- Message bubbles with "מ" avatar for assistant, animated 3-dot loading indicator
+- lucide-react icons throughout (Send, Settings, Moon/Sun, Pencil, etc.)
+- Inline reset confirmation replaces `window.confirm()`
+- Green/amber Badge components for vocabulary tracking

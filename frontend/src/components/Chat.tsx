@@ -1,5 +1,8 @@
 import { useEffect, useRef, useState } from "react";
 import { MessageBubble } from "./MessageBubble";
+import { Button } from "./ui/button";
+import { Input } from "./ui/input";
+import { Send } from "lucide-react";
 import type { ChatMessage } from "../hooks/useChat";
 
 interface ChatProps {
@@ -25,51 +28,56 @@ export function Chat({ messages, loading, onSend }: ChatProps) {
   }
 
   return (
-    <div style={{ display: "flex", flexDirection: "column", height: "100%" }}>
-      <div style={{ flex: 1, overflowY: "auto", padding: "1.5rem" }}>
+    <div className="flex flex-col h-full">
+      <div className="flex-1 overflow-y-auto p-6">
         {messages.length === 0 && (
-          <div style={{ textAlign: "center", color: "#9ca3af", marginTop: "3rem" }}>
-            <div style={{ fontSize: 40, marginBottom: "0.5rem" }}>🇮🇱</div>
-            <div style={{ fontSize: 18, fontWeight: 600, marginBottom: "0.25rem" }}>שלום! I'm Morah.</div>
-            <div>Your Hebrew tutor. Say hello to get started.</div>
+          <div className="text-center text-muted-foreground mt-12">
+            <div className="text-5xl mb-3">🇮🇱</div>
+            <div className="text-xl font-semibold mb-1 text-foreground">
+              שלום! I'm Morah.
+            </div>
+            <div className="text-sm">
+              Your Hebrew tutor. Say hello to get started.
+            </div>
           </div>
         )}
         {messages.map((msg, i) => (
           <MessageBubble key={i} role={msg.role} content={msg.content} />
         ))}
         {loading && (
-          <div style={{ display: "flex", justifyContent: "flex-start", marginBottom: "0.75rem" }}>
-            <div style={{ padding: "0.625rem 1rem", background: "#f3f4f6", borderRadius: "18px 18px 18px 4px", color: "#6b7280", fontSize: 15 }}>
-              Morah is thinking...
+          <div className="flex justify-start mb-3">
+            <div className="flex-shrink-0 w-7 h-7 rounded-full bg-primary/10 text-primary flex items-center justify-center text-xs font-bold mr-2 mt-1">
+              מ
+            </div>
+            <div className="px-4 py-3 bg-muted rounded-2xl rounded-bl-sm">
+              <span className="loading-dot" />
+              <span className="loading-dot" />
+              <span className="loading-dot" />
             </div>
           </div>
         )}
         <div ref={bottomRef} />
       </div>
 
-      <form onSubmit={handleSubmit} style={{ padding: "1rem 1.5rem", borderTop: "1px solid #e5e7eb", display: "flex", gap: "0.5rem" }}>
-        <input
+      <form
+        onSubmit={handleSubmit}
+        className="flex items-center gap-2 px-6 py-4 border-t border-border"
+      >
+        <Input
           value={input}
-          onChange={e => setInput(e.target.value)}
+          onChange={(e) => setInput(e.target.value)}
           placeholder="Type a message..."
           disabled={loading}
-          style={{
-            flex: 1, padding: "0.625rem 1rem", border: "1px solid #e5e7eb",
-            borderRadius: 24, fontSize: 15, outline: "none",
-            background: loading ? "#f9fafb" : "#fff",
-          }}
+          className="flex-1 rounded-full px-4 h-10"
         />
-        <button
+        <Button
           type="submit"
+          size="icon"
           disabled={!input.trim() || loading}
-          style={{
-            padding: "0.625rem 1.25rem", background: "#3b82f6", color: "#fff",
-            border: "none", borderRadius: 24, cursor: "pointer", fontSize: 15,
-            opacity: (!input.trim() || loading) ? 0.5 : 1,
-          }}
+          className="rounded-full h-10 w-10 shrink-0"
         >
-          →
-        </button>
+          <Send className="h-4 w-4" />
+        </Button>
       </form>
     </div>
   );

@@ -1,3 +1,5 @@
+import { cn } from "@/lib/utils";
+
 interface MessageBubbleProps {
   role: "user" | "assistant";
   content: string;
@@ -5,23 +7,23 @@ interface MessageBubbleProps {
 
 export function MessageBubble({ role, content }: MessageBubbleProps) {
   const isUser = role === "user";
+
   return (
-    <div style={{
-      display: "flex",
-      justifyContent: isUser ? "flex-end" : "flex-start",
-      marginBottom: "0.75rem",
-    }}>
-      <div dir="auto" style={{
-        maxWidth: "75%",
-        padding: "0.625rem 1rem",
-        borderRadius: isUser ? "18px 18px 4px 18px" : "18px 18px 18px 4px",
-        background: isUser ? "#3b82f6" : "#f3f4f6",
-        color: isUser ? "#fff" : "#111827",
-        fontSize: 15,
-        lineHeight: 1.5,
-        whiteSpace: "pre-wrap",
-        wordBreak: "break-word",
-      }}>
+    <div className={cn("flex mb-3", isUser ? "justify-end" : "justify-start")}>
+      {!isUser && (
+        <div className="flex-shrink-0 w-7 h-7 rounded-full bg-primary/10 text-primary flex items-center justify-center text-xs font-bold mr-2 mt-1">
+          מ
+        </div>
+      )}
+      <div
+        dir="auto"
+        className={cn(
+          "max-w-[75%] px-4 py-2.5 text-[15px] leading-relaxed whitespace-pre-wrap break-words",
+          isUser
+            ? "bg-primary text-primary-foreground rounded-2xl rounded-br-sm"
+            : "bg-muted text-foreground rounded-2xl rounded-bl-sm"
+        )}
+      >
         {content}
       </div>
     </div>
