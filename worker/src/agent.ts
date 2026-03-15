@@ -119,6 +119,35 @@ export class UserAgent {
     await this.save();
   }
 
+  async updateProfile(updates: {
+    profile?: Partial<Omit<import("./types").UserProfile, "personalNotes">> & { personalNotes?: string[] };
+    vocab?: { known?: string[]; struggling?: string[] };
+  }): Promise<Pick<UserState, "curriculum" | "vocab" | "profile">> {
+    const us = await this.load();
+
+    if (updates.profile) {
+      const { personalNotes, ...fields } = updates.profile;
+      for (const [key, value] of Object.entries(fields)) {
+        if (value === null || value === "") {
+          delete (us.profile as unknown as Record<string, unknown>)[key];
+        } else if (value !== undefined) {
+          (us.profile as unknown as Record<string, unknown>)[key] = value;
+        }
+      }
+      if (personalNotes !== undefined) {
+        us.profile.personalNotes = personalNotes;
+      }
+    }
+
+    if (updates.vocab) {
+      if (updates.vocab.known !== undefined) us.vocab.known = updates.vocab.known;
+      if (updates.vocab.struggling !== undefined) us.vocab.struggling = updates.vocab.struggling;
+    }
+
+    await this.save();
+    return { curriculum: us.curriculum, vocab: us.vocab, profile: us.profile };
+  }
+
   async resetProgress(): Promise<void> {
     this.userState = structuredClone(DEFAULT_STATE);
     await this.save();
@@ -145,6 +174,19 @@ export class UserAgent {
     if (url.pathname === "/state" && request.method === "GET") {
       const state = await this.getState();
       return Response.json(state);
+    }
+
+    if (url.pathname === "/profile" && request.method === "PUT") {
+      try {
+        const body = await request.json<{
+          profile?: Record<string, unknown>;
+          vocab?: { known?: string[]; struggling?: string[] };
+        }>();
+        const result = await this.updateProfile(body);
+        return Response.json(result);
+      } catch {
+        return new Response("Invalid JSON", { status: 400 });
+      }
     }
 
     if (url.pathname === "/reset" && request.method === "POST") {

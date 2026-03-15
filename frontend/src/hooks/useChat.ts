@@ -32,5 +32,5 @@ export function useChat() {
     }
   }, []);
 
-  return { messages, state, loading, error, send };
+  return { messages, state, setState, loading, error, send };
 }

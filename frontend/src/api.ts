@@ -3,7 +3,7 @@ export interface ChatResponse {
   state: {
     curriculum: { currentChapter: number; currentLesson: string; completedLessons: string[] };
     vocab: { known: string[]; struggling: string[]; introduced: string[] };
-    profile: { name?: string; originCountry?: string; neighborhood?: string; personalNotes: string[] };
+    profile: { name?: string; originCountry?: string; neighborhood?: string; occupation?: string; familySituation?: string; aliyahDate?: string; personalNotes: string[] };
   };
 }
 
@@ -42,6 +42,19 @@ export async function getState(): Promise<ChatResponse["state"]> {
 
 export async function resetProgress(): Promise<void> {
   await fetch(`${API_BASE}/reset`, { method: "POST", headers: authHeaders() });
+}
+
+export async function updateProfile(updates: {
+  profile?: Partial<UserState["profile"]>;
+  vocab?: { known?: string[]; struggling?: string[] };
+}): Promise<UserState> {
+  const res = await fetch(`${API_BASE}/profile`, {
+    method: "PUT",
+    headers: authHeaders({ "Content-Type": "application/json" }),
+    body: JSON.stringify(updates),
+  });
+  if (!res.ok) throw new Error(`Profile update failed: ${res.status}`);
+  return res.json();
 }
 
 export async function registerTelegram(botToken: string): Promise<{ ok: boolean }> {

@@ -5,7 +5,7 @@ import { Settings } from "./components/Settings";
 import { useChat } from "./hooks/useChat";
 
 export default function App() {
-  const { messages, state, loading, error, send } = useChat();
+  const { messages, state, setState, loading, error, send } = useChat();
   const [settingsOpen, setSettingsOpen] = useState(false);
 
   const handleReset = useCallback(async () => {
@@ -44,7 +44,7 @@ export default function App() {
         <Chat messages={messages} loading={loading} onSend={send} />
       </main>
 
-      {settingsOpen && <Settings onClose={() => setSettingsOpen(false)} onReset={handleReset} />}
+      {settingsOpen && <Settings onClose={() => setSettingsOpen(false)} onReset={handleReset} state={state} onStateUpdate={setState} />}
     </div>
   );
 }
