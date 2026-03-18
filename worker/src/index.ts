@@ -30,7 +30,19 @@ export default {
     // Register Telegram webhook: POST /telegram/register
     if (url.pathname === "/telegram/register" && request.method === "POST") {
       const { botToken } = await request.json<{ botToken: string }>();
+      const userId = getUserId(request);
       const workerUrl = `${url.protocol}//${url.hostname}`;
+
+      // Store botToken → userId mapping so the webhook handler can route
+      // Telegram messages to the correct web user's DO
+      const registryId = env.USER_AGENT.idFromName("tg-registry");
+      const registry = env.USER_AGENT.get(registryId);
+      await registry.fetch(new Request("http://internal/kv", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ key: botToken, value: userId }),
+      }));
+
       const result = await registerWebhook(workerUrl, botToken);
       return Response.json(result, { headers: CORS_HEADERS });
     }
