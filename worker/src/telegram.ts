@@ -22,8 +22,18 @@ export async function handleTelegramWebhook(
   const chatId = String(update.message.chat.id);
   const text = update.message.text;
 
-  // Each Telegram chat_id gets its own DO
-  const doId = env.USER_AGENT.idFromName(`tg:${chatId}`);
+  // Look up which web user registered this bot token so we can share state
+  const registryId = env.USER_AGENT.idFromName("tg-registry");
+  const registry = env.USER_AGENT.get(registryId);
+  const lookupRes = await registry.fetch(
+    new Request(`http://internal/kv/${encodeURIComponent(token)}`, { method: "GET" })
+  );
+  const { value: userId } = await lookupRes.json<{ value: string | null }>();
+
+  // Route to the web user's DO so Telegram and web UI share the same memory.
+  // Fall back to a tg-scoped DO if no registration is found.
+  const doName = userId ? `web:${userId}` : `tg:${chatId}`;
+  const doId = env.USER_AGENT.idFromName(doName);
   const stub = env.USER_AGENT.get(doId);
 
   // Register telegram config on first message

@@ -207,6 +207,19 @@ export class UserAgent {
       return Response.json({ ok: true });
     }
 
+    // Generic KV store used by the tg-registry singleton DO
+    if (url.pathname === "/kv" && request.method === "POST") {
+      const { key, value } = await request.json<{ key: string; value: string }>();
+      await this.state.storage.put(`kv:${key}`, value);
+      return Response.json({ ok: true });
+    }
+
+    if (url.pathname.startsWith("/kv/") && request.method === "GET") {
+      const key = decodeURIComponent(url.pathname.slice("/kv/".length));
+      const value = await this.state.storage.get<string>(`kv:${key}`);
+      return Response.json({ value: value ?? null });
+    }
+
     return new Response("Not found", { status: 404 });
   }
 }
